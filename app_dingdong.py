@@ -24,7 +24,6 @@ driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
 
 
 def find_element_by_id(element_id):
-    print("find_element_by_id")
     if element_id is None:
         return None
     while True:
@@ -54,35 +53,70 @@ def find_elements_by_id(elements_id):
 
 
 def skip_advertisement():
+    """
+    跳过广告
+    :return:
+    """
     time.sleep(0.2)
     find_element_by_id("com.yaya.zone:id/tv_skip").click()
 
 
 def enter_shopping_cart():
-    time.sleep(1)
-    find_element_by_id("com.yaya.zone:id/ani_car").click()
+    """
+    进入购物车
+    :return:
+    """
+    time.sleep(0.5)
+    while True:
+        element = find_element_by_id("com.yaya.zone:id/ani_car")
+        if element:
+            element.click()
+            print("enter_shopping_cart success")
+            break
+        time.sleep(0.3)
 
 
 def confirm_order():
-    find_element_by_id("com.yaya.zone:id/btn_submit").click()
+    """
+    去结算
+    :return:
+    """
+    time.sleep(0.5)
+    while True:
+        element = find_element_by_id("com.yaya.zone:id/btn_submit")
+        if element:
+            element.click()
+            print("confirm_order success")
+            break
+        else:
+            # 购物车为空
+            find_element_by_id("com.yaya.zone:id/ani_home").click()
+            enter_shopping_cart()
+            time.sleep(0.5)
+        time.sleep(0.3)
 
 
 def auto_pay():
-    submit_element = find_element_by_id("com.yaya.zone:id/tv_submit")
-    if submit_element:
-        while True:
-            submit_element.click()
-            if select_appointment():
-                break
-            time.sleep(0.2)
-        # select_payment_method()
-        find_element_by_id("com.yaya.zone:id/tv_submit").click()
-        # need to use appium-inspector to view ali pay & weChat pay button("确认支付") then press pwd
-        press_pay_pwd()
+    while True:
+        submit_element = find_element_by_id("com.yaya.zone:id/tv_submit")
+        if submit_element:
+            while True:
+                submit_element.click()
+                if select_appointment():
+                    break
+                time.sleep(0.5)
+            # select_payment_method()
+            find_element_by_id("com.yaya.zone:id/tv_submit").click()
+            # need to use appium-inspector to view ali pay & weChat pay button("确认支付") then press pwd
+            press_pay_pwd()
+            break
 
 
 def select_appointment():
-    # 选择时间
+    """
+    选择时间
+    :return:
+    """
     select_hour_root_elements = find_elements_by_id("com.yaya.zone:id/cl_item_select_hour_root")
     for root_element in select_hour_root_elements:
         title_element = root_element.find_element_by_id("com.yaya.zone:id/tv_item_select_hour_title")
@@ -121,4 +155,5 @@ if __name__ == '__main__':
     enter_shopping_cart()
     confirm_order()
     auto_pay()
+    print("end....")
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
